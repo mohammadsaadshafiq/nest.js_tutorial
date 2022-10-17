@@ -7,12 +7,32 @@ import {
   Patch,
   Delete,
 } from '@nestjs/common';
+import { Product } from './product.model';
 import { ProductService } from './product.service';
+import { Products } from '../entites/products.entiteis';
 
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
-
+  @Post()
+  create(@Body() createUserDto: Product) {
+    return this.productService.create(createUserDto);
+  }
+  @Get()
+  getAll() {
+    return this.productService.findAll();
+  }
+  @Patch()
+  update(@Body() createUserDto: Product) {
+    return this.productService.update(createUserDto);
+  }
+  @Delete()
+  removeProduct(@Param('id') id: string) {
+    return this.productService.remove(id);
+  }
+  /**
+   * Initial requests , only saves in array
+   */
   @Post()
   addProduct(
     @Body('title') prodTitle: string,

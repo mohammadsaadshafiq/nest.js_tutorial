@@ -5,6 +5,7 @@ import { ProductController } from './product/product.controller';
 import { ProductModule } from './product/product.module';
 import { ProductService } from './product/product.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { Products } from './entites/products.entiteis';
 
 @Module({
   imports: [
@@ -13,14 +14,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       type: 'mongodb',
       host: '127.0.0.1',
       port: 27018,
-      username: 'root',
-      password: 'root',
       database: 'test',
-      entities: ['src/entity/**/*.ts'],
+      entities: [Products],
       synchronize: true,
     }),
   ],
-  controllers: [AppController, ProductController],
-  providers: [AppService, ProductService],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}

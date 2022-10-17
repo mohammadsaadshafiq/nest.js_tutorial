@@ -1,9 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { isEmpty, NotFoundError } from 'rxjs';
 import { Product } from './product.model';
-
+import { Products } from '../entites/products.entiteis';
 @Injectable()
 export class ProductService {
+  constructor(
+    @InjectRepository(Products)
+    private productRepo: Repository<Products>,
+  ) {}
   products: Product[] = [];
 
   insertProduct(title: string, description: string, price: number) {
@@ -46,5 +52,32 @@ export class ProductService {
   private findProductIndex(prodId) {
     const productIndex = this.products.findIndex((x) => x.id === prodId);
     return productIndex;
+  }
+
+  // With Other method
+  create(createProductDto: Product) {
+    return this.productRepo.create({
+      description: createProductDto.description,
+      title: createProductDto.title,
+      price: createProductDto.price,
+    });
+  }
+  async findAll(): Promise<Products[]> {
+    return this.productRepo.find();
+  }
+  findOne(id: string): Promise<Products> {
+    return this.productRepo.findOne({
+      where: {
+        id,
+      },
+    });
+  }
+  async remove(id: string): Promise<void> {
+    await this.productRepo.delete(id);
+  }
+  update(createProductDto) {
+    let product = this.findOne(createProductDto.id);
+    product = createProductDto;
+    return product;
   }
 }
