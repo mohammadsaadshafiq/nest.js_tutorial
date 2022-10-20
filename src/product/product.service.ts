@@ -1,17 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { isEmpty, NotFoundError } from 'rxjs';
+import { MongoRepository, Repository } from 'typeorm';
 import { Product } from './product.model';
 import { Products } from '../entites/products.entiteis';
-import { ObjectID } from 'mongodb';
+global.crypto = require('crypto');
+
 @Injectable()
 export class ProductService {
   constructor(
     @InjectRepository(Products)
-    private productRepo: Repository<Products>,
+    private productRepo: MongoRepository<Products>,
   ) {}
   products: Product[] = [];
+
+  // With TypeORM method
+  create(createProductDto: Product) {
+    createProductDto.productId = crypto.randomUUID();
+    return this.productRepo.save(createProductDto);//use update with upsert
+  }
+  async findAll(): Promise<Products[]> {
+    return this.productRepo.find();
+  }
+  async findOne(productId: string): Promise<Products> {
+    const result = await this.productRepo.findOneBy({ productId }, { _id: 0 });//remove
+    return result;
+  }
+  async remove(productId: string) {
+    const result = await this.productRepo.findOneBy({ productId });
+    return await this.productRepo.remove(result);
+  }
+  async update(productId: string, updatedProduct: Product) {
+    const productObj = await this.productRepo.findOneBy({ productId });
+    productObj.description = updatedProduct.description;
+    productObj.title = updatedProduct.title;
+    productObj.price = updatedProduct.price;
+    return await this.productRepo.save(productObj); //update it 
+  }
 
   // insertProduct(title: string, description: string, price: number) {
   //   const prodId = Math.random().toString();
@@ -54,27 +78,4 @@ export class ProductService {
   //   const productIndex = this.products.findIndex((x) => x.id === prodId);
   //   return productIndex;
   // }
-
-  // With TypeORM method
-  create(createProductDto: Product) {
-    return this.productRepo.save(this.productRepo.create(createProductDto));
-  }
-  async findAll(): Promise<Products[]> {
-    return this.productRepo.find();
-  }
-  async findOne(id: string): Promise<Products> {
-    const result = await this.productRepo.findOne(new ObjectID(id));
-    return result;
-  }
-  async remove(id: string) {
-    const result = await this.productRepo.findOne(new ObjectID(id));
-    return await this.productRepo.remove(result);
-  }
-  async update(id: string, updatedProduct: Product) {
-    const productObj = await this.productRepo.findOne(new ObjectID(id));
-    productObj.description = updatedProduct.description;
-    productObj.title = updatedProduct.title;
-    productObj.price = updatedProduct.price;
-    return await this.productRepo.save(productObj);
-  }
 }

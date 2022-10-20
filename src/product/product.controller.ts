@@ -7,6 +7,8 @@ import {
   Param,
   Patch,
   Delete,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { Product } from './product.model';
 import { ProductService } from './product.service';
@@ -25,7 +27,8 @@ export class ProductController {
   @Get()
   @ApiOkResponse({ description: 'All Products' })
   getAll() {
-    return this.productService.findAll();
+    const products = this.productService.findAll();
+    return products;
   }
   @Put(':id')
   @ApiBody({ type: Product })
@@ -40,8 +43,14 @@ export class ProductController {
   }
   @Get(':id')
   @ApiOkResponse({ description: 'Product' })
+  // tell the swagger about the exeption 
   findOne(@Param('id') id: string) {
-    return this.productService.findOne(id);
+    const product = this.productService.findOne(id);
+    if (product) {
+      return product;
+    } else {
+      throw new HttpException('No product found', HttpStatus.NOT_FOUND); // just throw a not found exception 
+    }
   }
   /**
    * Initial requests , only saves in array

@@ -1,16 +1,11 @@
-import {
-  PrimaryGeneratedColumn,
-  ObjectIdColumn,
-  Column,
-  Entity,
-  ObjectID,
-} from 'typeorm';
-import {} from 'typeorm';
+import { ObjectIdColumn, Column, Entity } from 'typeorm';
+import { Exclude } from 'class-transformer';
 @Entity()
 export class Products {
-  @ObjectIdColumn()
-  id: string;
-
+  @ObjectIdColumn({ select: false })
+  _id: string;
+  @Column()
+  productId!: string;
   @Column()
   title: string;
 
