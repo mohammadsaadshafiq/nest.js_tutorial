@@ -16,13 +16,13 @@ export class ProductService {
   // With TypeORM method
   create(createProductDto: Product) {
     createProductDto.productId = crypto.randomUUID();
-    return this.productRepo.save(createProductDto);//use update with upsert
+    return this.productRepo.save(createProductDto); //use update with upsert
   }
   async findAll(): Promise<Products[]> {
     return this.productRepo.find();
   }
   async findOne(productId: string): Promise<Products> {
-    const result = await this.productRepo.findOneBy({ productId }, { _id: 0 });//remove
+    const result = await this.productRepo.findOneBy({ productId }); //remove
     return result;
   }
   async remove(productId: string) {
@@ -34,7 +34,7 @@ export class ProductService {
     productObj.description = updatedProduct.description;
     productObj.title = updatedProduct.title;
     productObj.price = updatedProduct.price;
-    return await this.productRepo.save(productObj); //update it 
+    return await this.productRepo.save(productObj); //update it
   }
 
   // insertProduct(title: string, description: string, price: number) {
